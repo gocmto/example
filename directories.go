@@ -69,6 +69,51 @@ func main() {
 	createEmptyFile("subdir/parent/file3")
 	createEmptyFile("subdir/parent/child/file4")
 
+	info, err := os.Stat("subdir/parent/child/file4")
+	fmt.Println("info.Mode()") // -rw-rw-rw-
+	fmt.Println(info.Mode())
+	fmt.Println("info.ModTime()") // 2020-04-21 09:06:08.104909 +0300 MSK
+	fmt.Println(info.ModTime())
+	fmt.Println("info.Size()")
+	fmt.Println(info.Size())
+
+	/**
+	// Exactly one of O_RDONLY, O_WRONLY, or O_RDWR must be specified.
+	O_RDONLY int = syscall.O_RDONLY // open the file read-only.
+	O_WRONLY int = syscall.O_WRONLY // open the file write-only.
+	O_RDWR   int = syscall.O_RDWR   // open the file read-write.
+	// The remaining values may be or'ed in to control behavior.
+	O_APPEND int = syscall.O_APPEND // append data to the file when writing.
+	O_CREATE int = syscall.O_CREAT  // create a new file if none exists.
+	O_EXCL   int = syscall.O_EXCL   // used with O_CREATE, file must not exist.
+	O_SYNC   int = syscall.O_SYNC   // open for synchronous I/O.
+	O_TRUNC  int = syscall.O_TRUNC  // truncate regular writable file when opened.
+	*/
+	_, e := os.OpenFile("subdir/parent/child/file4", os.O_WRONLY, 0666)
+	if os.IsPermission(e) {
+		fmt.Println("Unable to write to ", "subdir/parent/child/file4")
+		fmt.Println(err)
+		//os.Exit(1)
+	}
+
+	/**
+	644 (-rw-r--r--)
+	Все пользователи имеют право чтения; владелец может редактировать
+	660 (-rw-rw----)
+	Владелец и группа могут читать и редактировать; остальные не имеют права выполнять никаких действий
+	664 (-rw-rw-r--)
+	Все пользователи имеют право чтения; владелец и группа могут редактировать
+	666 (-rw-rw-rw-)
+	Все пользователи могут читать и редактировать
+	700 (-rwx------)
+	Владелец может читать, записывать и запускать на выполнение; никто другой не имеет права выполнять никакие действия
+	744 (-rwxr--r--)
+	Каждый пользователь может читать, владелец имеет право редактировать и запускать на выполнение
+	755 (-rwxr-xr-x)
+	Каждый пользователь имеет право читать и запускать на выполнение; владелец может редактировать
+	777 (-rwxrwxrwx)
+	*/
+
 	// получили все файлы из директории
 	c, err := ioutil.ReadDir("subdir/parent")
 	check(err)
