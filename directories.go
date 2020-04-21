@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func checkSubdir() {
+func checkDirSubdir() {
 
 	// первый возвращенный результат нам не нужен
 	// поэтому вместо него подчеркивание - пустота
@@ -24,14 +24,14 @@ func checkSubdir() {
 func getFullPath(path string) {
 	// выводим полный путь к месту где была создана временна директория
 	dir, error := filepath.Abs(path)
-	check(error)
+	checkDir(error)
 	fmt.Println("Created at: " + dir)
 }
 
 func main() {
 
 	// проверяем сабдиректорию
-	checkSubdir()
+	checkDirSubdir()
 
 	// удаляем временную директорию в самом конце
 	//defer os.RemoveAll("subdir")
@@ -39,7 +39,7 @@ func main() {
 	// анонимная функция: объявили и тут же вызвали
 	func(message string) {
 		dir, error := filepath.Abs(filepath.Dir(os.Args[0]))
-		check(error)
+		checkDir(error)
 		fmt.Println(message + dir + "\n")
 	}("Actual folder: ")
 	/**
@@ -49,7 +49,7 @@ func main() {
 
 	// директория будет создана там, где находится этот файл
 	err := os.Mkdir("subdir", 0755)
-	check(err)
+	checkDir(err)
 
 	// выводим полный путь к месту где была создана временна директория
 	getFullPath("subdir")
@@ -57,13 +57,13 @@ func main() {
 	// замыкание: записали анонимную функцию в переменную
 	createEmptyFile := func(name string) {
 		d := []byte("")
-		check(ioutil.WriteFile(name, d, 0644))
+		checkDir(ioutil.WriteFile(name, d, 0644))
 	}
 
 	createEmptyFile("subdir/file1")
 
 	err = os.MkdirAll("subdir/parent/child", 0755)
-	check(err)
+	checkDir(err)
 
 	createEmptyFile("subdir/parent/file2")
 	createEmptyFile("subdir/parent/file3")
@@ -116,7 +116,7 @@ func main() {
 
 	// получили все файлы из директории
 	c, err := ioutil.ReadDir("subdir/parent")
-	check(err)
+	checkDir(err)
 
 	fmt.Println("\nListing subdir/parent")
 
@@ -130,10 +130,10 @@ func main() {
 
 	// перешли из subdir в директорию subdir/parent/child
 	err = os.Chdir("subdir/parent/child")
-	check(err)
+	checkDir(err)
 
 	c, err = ioutil.ReadDir(".")
-	check(err)
+	checkDir(err)
 
 	fmt.Println("Listing subdir/parent/child")
 	for _, entry := range c {
@@ -144,13 +144,13 @@ func main() {
 	getFullPath("../../../../..")
 
 	err = os.Chdir("../../..")
-	check(err)
+	checkDir(err)
 
 	fmt.Println("Visiting subdir")
 	err = filepath.Walk("subdir", visit)
 }
 
-func check(e error) {
+func checkDir(e error) {
 	if e != nil {
 		panic(e)
 	}
